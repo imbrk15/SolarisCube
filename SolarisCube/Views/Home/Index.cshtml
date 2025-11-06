@@ -1,0 +1,1202 @@
+﻿@model SolarisCube.Models.ContactModel
+
+
+<style>
+
+    /* === Responsive helpers === */
+    .img-cover {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .aspect-16x9 {
+        aspect-ratio: 16/9;
+    }
+
+    .aspect-4x3 {
+        aspect-ratio: 4/3;
+    }
+
+    .hero h2 {
+        font-size: clamp(28px, 5vw, 56px);
+        text-align: center;
+    }
+
+    .section-title h2 {
+        font-size: clamp(22px, 2.6vw, 36px);
+    }
+
+    .section-title p {
+        font-size: clamp(14px, 1.6vw, 18px);
+    }
+
+    .service-item {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+        .service-item .img {
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .service-item .details {
+            flex: 1;
+        }
+
+    .team-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 12px;
+    }
+
+    .team-footer {
+        text-align: center;
+    }
+
+    .cursor-zoom-out {
+        cursor: zoom-out;
+    }
+
+    /* Tighten paddings on small screens */
+    @@media (max-width: 575.98px) {
+        .stats-simple
+
+    {
+        padding: 28px 0;
+    }
+
+    .service-item .details {
+        padding: 14px;
+    }
+
+    }
+
+    /* --- Section background like your previous hero --- */
+    .t-hero {
+        position: relative;
+        background-image: var(--t-hero-bg);
+        background-size: cover;
+        background-position: center;
+        padding-top: 64px;
+        padding-bottom: 64px;
+        isolation: isolate;
+    }
+
+        .t-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            /* lighter overlay so cards read cleanly */
+            background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.35));
+        }
+
+        .t-hero > .container {
+            position: relative;
+            z-index: 1;
+        }
+
+    /* --- Tokens --- */
+    :root {
+        --mc-bg: #ffffff;
+        --mc-fg: #0f1220;
+        --mc-muted: #667085;
+        --mc-ring1: 111,173,255; /* blue */
+        --mc-ring2: 255,133,182; /* pink */
+        --mc-shadow: 0 10px 26px rgba(0,0,0,.10);
+        --mc-shadow-lg: 0 18px 46px rgba(0,0,0,.16);
+    }
+    @@media (prefers-color-scheme: dark) {
+        : root
+
+    {
+        /* Colors kept for text, but cards remain WHITE by overrides below */
+        --mc-fg: #0f1220;
+        --mc-muted: #667085;
+        --mc-shadow: 0 12px 32px rgba(0,0,0,.35);
+        --mc-shadow-lg: 0 18px 50px rgba(0,0,0,.45);
+    }
+
+    }
+
+    /* --- Card --- */
+    .mcard {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        width: 100%;
+        max-width: 320px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #ffffff; /* force white card */
+        color: var(--mc-fg);
+        box-shadow: var(--mc-shadow);
+        transition: transform .25s ease, box-shadow .25s ease;
+        position: relative;
+        border: 1px solid rgba(0,0,0,.06);
+    }
+
+        .mcard::before { /* thin gradient border */
+            content: "";
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: 20px;
+            pointer-events: none;
+            background: linear-gradient(135deg, rgba(var(--mc-ring1),.7), rgba(var(--mc-ring2),.7));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: .35;
+            transition: opacity .25s;
+        }
+
+        .mcard:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--mc-shadow-lg);
+        }
+
+            .mcard:hover::before {
+                opacity: .8;
+            }
+
+    /* Image area: consistent height on all cards */
+    .mcard-img {
+        aspect-ratio: 4/3; /* change to 1/1 for perfectly square */
+        overflow: hidden;
+        background: #0b0d12;
+    }
+
+        .mcard-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform: scale(1.03);
+            transition: transform .45s ease;
+        }
+
+    .mcard:hover .mcard-img img {
+        transform: scale(1.10);
+    }
+
+    /* Body (separate from image; solid white background) */
+    .mcard-body {
+        position: static;
+        text-align: center;
+        padding: 14px 16px 18px;
+        background: #ffffff; /* force white behind name/role */
+        color: #0f1220;
+        border-top: 1px solid #eef1f4;
+        min-height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .mcard-name {
+        margin: 0 0 4px;
+        font-size: 1.06rem;
+        font-weight: 800;
+        letter-spacing: .2px;
+    }
+
+    .mcard-role {
+        margin: 0;
+        font-size: .95rem;
+        color: var(--mc-muted);
+    }
+
+    /* Ensure cards stay white on hero backgrounds (no glass, no tint) */
+    .t-hero .mcard {
+        background: #ffffff !important;
+        backdrop-filter: none !important;
+        border: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* Accessibility focus */
+    .mcard:focus-within, .mcard:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(var(--mc-ring1),.35), var(--mc-shadow-lg);
+    }
+
+    /* Optional: slightly tighter spacing on very small screens */
+    @@media (max-width:400px) {
+        .mcard
+
+    {
+        max-width: 300px;
+    }
+
+    .mcard-body {
+        padding: 12px 14px 16px;
+    }
+
+    }
+
+/* FOR STATS SECTION */
+    /* Simple, clean stat tiles */
+    :root {
+        --s-bg: #ffffff;
+        --s-fg: #0f1220;
+        --s-muted: #6b7280;
+        --s-border: rgba(15,18,32,.08);
+        --s-shadow: 0 8px 22px rgba(0,0,0,.06);
+        --s-shadow-h: 0 12px 30px rgba(0,0,0,.10);
+        --s-accent: #4f8cff; /* change to your brand color */
+    }
+
+    .stats-simple {
+        background: #f7f9fc;
+        padding: 40px 0;
+    }
+
+    .s-card {
+        background: var(--s-bg);
+        color: var(--s-fg);
+        border: 1px solid var(--s-border);
+        border-radius: 16px;
+        box-shadow: var(--s-shadow);
+        text-align: center;
+        padding: 18px 14px;
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .s-number {
+        font-weight: 800;
+        font-size: clamp(24px, 2.2vw, 32px);
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .s-label {
+        font-size: .95rem;
+        color: var(--s-muted);
+    }
+
+    /* small accent under each tile */
+    .s-accent {
+        display: block;
+        width: 36px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--s-accent);
+        margin: 10px auto 0;
+        opacity: .9;
+    }
+
+    /* gentle hover */
+    .s-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--s-shadow-h);
+        border-color: rgba(79,140,255,.35);
+    }
+
+    /* compact on very small screens */
+    @@media (max-width: 575.98px) {
+        .stats-simple
+
+    {s
+        padding: 28px 0;
+    }
+
+    .s-card {
+        padding: 16px 12px;
+    }
+
+    }
+    /* ===== Floor Plan Modal Custom Size ===== */
+    #floorModal .modal-dialog {
+        max-width: 700px; /* reduce width (try 600–800px based on preference) */
+        width: 90%; /* makes it responsive */
+    }
+
+    #floorModal img {
+        width: 100%;
+        height: auto;
+        object-fit: contain; /* ensures full image fits */
+        max-height: 80vh; /* limits image height to avoid scrolling */
+    }
+
+</style>
+
+<main class="main">
+   
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+
+        <img src="~/img/20-fotor-20250913017 (1).webp" alt="" data-aos="fade-in" />
+        <div class="container d-flex flex-column align-items-center">
+            <h2 data-aos="fade-up" data-aos-delay="100">​ ​​YOUR BRAND<br /> OUR LANDMARK</h2>       
+            <div class="d-flex mt-4" data-aos="fade-up" data-aos-delay="300">
+                <a href="#contactForm" class="btn-get-started">Enquire</a>
+            </div>
+        </div>
+
+    </section>
+    <!-- Solaris Meaning Strip -->
+    <section id="solaris-meaning" class="py-4 bg-white border-top border-bottom">
+        <div class="container" data-aos="fade-up" data-aos-delay="120">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+                        <i class="bi bi-sun fs-2 text-warning"></i>
+                        <p class="mb-0 fs-5 text-center text-md-start">
+                            <strong>“Solaris”</strong> symbolizes <em>energy, brightness, vitality, and growth</em> — reflecting
+                            <strong>success, progress, and positivity</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- /Hero Section -->
+    <!-- About Section -->
+    <section class="py-5 bg-light" id="about">
+        <div class="container">
+            <div class="row align-items-center gy-5">
+
+                <!-- Left Side: Image -->
+                <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+                    <h1 class="fw-bold display-5 mb-3">
+                        <span class="text-gradient">SolarisCube</span>
+                    </h1>
+                    <h4 class="text-dark fw-semibold">Amravati’s Next Commercial Landmark</h4>
+
+                    <div class="position-relative mt-4">
+                        <img src="~/img/image (1).webp"
+                             class="img-fluid rounded-4 shadow-lg hover-scale"
+                             alt="Solaris Cube Building">
+                    </div>
+                </div>
+
+                <!-- Right Side: Content -->
+                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="250">
+                    <div class="ps-lg-4">
+
+                        <!-- Powerful Opening -->
+                        <h3 class="fw-bold text-dark">A Landmark That Elevates Your Business</h3>
+                        <p class="fs-6 text-muted border-start ps-3">
+  “Solaris” symbolizes energy, brightness, vitality, and growth — reflecting success, progress, and positivity.
+</p>
+                        <p class="fs-5 text-muted">
+                            <strong>Solaris Cube</strong> isn’t just another commercial complex —
+                            it’s <em>Amravati’s new symbol of growth</em>. With its striking glass façade
+                            and prime corner presence, Solaris Cube is crafted to give your brand
+                            unmatched visibility and prestige.
+                        </p>
+
+                        <!-- Features with Benefit-driven Language -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <ul class="list-unstyled fs-6">
+                                    <li class="mb-3">
+                                        <i class="bi bi-building-fill-check text-danger fs-5 me-2"></i>
+                                        <strong>Expansive Built-up Area:</strong> ≈ 2,753.48 sq. m. — giving your business room to grow.
+                                    </li>
+                                    <li class="mb-3">
+                                        <i class="bi bi-layers-fill text-danger fs-5 me-2"></i>
+                                        <strong>7 Premium Floors:</strong> (G+6) + rooftop — designed for retail, offices & experiences.
+                                    </li>
+                                    <li class="mb-3">
+                                        <i class="bi bi-car-front-fill text-danger fs-5 me-2"></i>
+                                        <strong>Ample Parking:</strong> 106 bays — ensuring comfort for your customers & staff.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Trust & Confidence -->
+                        <p class="mt-4 fs-6">
+                            Backed by <strong>SOLARIS INFRA</strong> and fully <strong>MahaRERA registered</strong>,
+                            Solaris Cube offers not just space, but <em>security and confidence</em> — a
+                            future-proof investment in the heart of Amravati.
+                        </p>
+
+                      
+
+
+                        <!-- Call to Action -->
+                        <div class="mt-4">
+                            
+                            <a href="#contactForm" class="btn btn-danger btn-lg rounded-pill px-5">
+                                Enquire
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Secondary Image -->
+                <div class="position-relative mt-4">
+                    <img src="~/img/image (2).webp"
+                         class="img-fluid rounded-4 shadow hover-scale"
+                         alt="Solaris Cube Top View">
+                </div>
+            </div>
+        </div>
+       
+    </section>
+
+    <!-- Extra CSS for gradient + hover effects -->
+    <style>
+        .text-gradient {
+            background: linear-gradient(45deg, #e52e71, #ff8a00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hover-scale {
+            transition: transform .4s ease;
+        }
+
+            .hover-scale:hover {
+                transform: scale(1.05);
+            }
+    </style>
+
+    <section id="stats" class="section stats-simple">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="row row-cols-2 row-cols-md-4 g-3 g-md-4 justify-content-center align-items-stretch">
+
+                <div class="col">
+                    <article class="s-card h-100">
+                        <div class="s-number">
+                            <span class="purecounter" data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1"></span>
+                        </div>
+                        <div class="s-label">Approaching</div>
+                        <span class="s-accent" aria-hidden="true"></span>
+                    </article>
+                </div>
+
+                <div class="col">
+                    <article class="s-card h-100">
+                        <div class="s-number">
+                            <span class="purecounter" data-purecounter-start="0" data-purecounter-end="106" data-purecounter-duration="1"></span>
+                        </div>
+                        <div class="s-label">Parking</div>
+                        <span class="s-accent" aria-hidden="true"></span>
+                    </article>
+                </div>
+
+                <div class="col">
+                    <article class="s-card h-100">
+                        <div class="s-number">
+                            <span class="purecounter" data-purecounter-start="0" data-purecounter-end="2027" data-purecounter-duration="1"></span>
+                        </div>
+                        <div class="s-label">Year of Completion</div>
+                        <span class="s-accent" aria-hidden="true"></span>
+                    </article>
+                </div>
+
+                <div class="col">
+                    <article class="s-card h-100">
+                        <div class="s-number">
+                            <span class="purecounter" data-purecounter-start="0" data-purecounter-end="2753" data-purecounter-duration="1"></span>
+                        </div>
+                        <div class="s-label">Built-up Area</div>
+                        <span class="s-accent" aria-hidden="true"></span>
+                    </article>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Services Section -->
+    <section id="services" class="services section">
+
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+            <h2>Features</h2>
+            <p>Features and Amenities<br></p>
+        </div><!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="row gy-5">
+
+                <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="service-item">
+                        <div class="img aspect-4x3">
+                            <img src="~/img/lift (1)_11zon.webp" class="img-fluid" class="img-cover" alt=""><img src="" />
+                        </div>
+                        <div class="details position-relative">
+                            
+                            <div class="icon">
+                              
+                                <i class="bi bi-activity"></i>
+                            </div>
+                            <a href="" class="stretched-link">
+                                <h3>Vertical mobility</h3>
+                            </a>
+                            <p>2 Passenger Lifts (LIFT-1, LIFT-2) + Stretcher Lift serving all levels for universal and healthcare access.</p>
+                        </div>
+                    </div>
+                </div><!-- End Service Item -->
+
+                <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="service-item">
+                        <div class="img aspect-4x3">
+                            <img src="~/img/hospital (1)_11zon.webp" class="img-fluid" class="img-cover" alt="">
+                        </div>
+                        <div class="details position-relative">
+                            <div class="icon">
+                                <i class="bi bi-broadcast"></i>
+                            </div>
+                            <a href="" class="stretched-link">
+                                <h3>Healthcare-ready stack</h3>
+                            </a>
+                            <p>Reception & Waiting, OPD 1–6 with a Medical Shop and  Pathology Lab on the diagnostic floor.</p>
+                        </div>
+                    </div>
+                </div><!-- End Service Item -->
+
+                <div class="col-xl-4 col-md-6" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="service-item">
+                        <div class="img aspect-4x3">
+                            <img src="~/img/wf (1)_11zon.webp" class="img-fluid" class="img-cover" alt="" style="height:310px;" />
+                        </div>
+                        <div class="details position-relative">
+                            <div class="icon">
+                                <i class="bi bi-easel"></i>
+                            </div>
+                            <a href="" class="stretched-link">
+                                <h3>Wellness floor</h3>
+                            </a>
+                            <p> Full-spec Gym with Steam rooms, Changing, and Lockers (M/F), plus maintenance and lobby support.</p>
+                        </div>
+                    </div>
+                </div><!-- End Service Item -->
+
+
+            </div>
+
+        </div>
+
+    </section><!-- /Services Section -->
+    <!-- Features Section -->
+    <section id="location" class="section alt location-block" data-aos="fade-up">
+        <div class="container">
+
+            <!-- Centered section title like the reference -->
+            <div class="loc-heading center">
+                <h2 class="loc-title">LOCATION</h2>
+                <p class="loc-sub">THE EPICENTER OF ENTERPRISE</p>
+                <span class="loc-divider"></span>
+            </div>
+
+            <div class="row g-4 align-items-start">
+                <!-- LEFT: Title + distances + address -->
+                <div class="col-lg-12 order-2 order-lg-1">
+
+                    <!-- Distances list with dot leaders -->
+                    <section id="location" class="py-5 bg-light">
+                        <div class="container">
+
+                            <!-- Section Title -->
+                            <div class="text-center mb-5" data-aos="fade-up">
+                                <h5 class="text-muted fst-italic">Shegaon Square: The New Business Hub on Amravati’s Map</h5>
+                                <h5 class="text-muted fst-italic">(Bhagirathi Bai Deshmukh School)</h5>
+                                <div class="divider mx-auto my-3"></div>
+                            </div>
+
+                            <div class="row gy-5 align-items-center">
+
+
+                               
+
+
+                                <!-- Left Column: Distance List -->
+                                <div class="col-lg-6" data-aos="fade-right" data-aos-delay="150">
+                                    <ul class="list-unstyled fs-6">
+                                        <li class="mb-3">
+                                            <i class="bi bi-shop text-danger fs-5 me-2"></i>
+                                            <strong>Gadge Nagar Police Station (200 m)</strong>
+                                            <br><small class="text-muted">Nearby restaurant & food area.</small>
+                                        </li>   
+                                        <li class="mb-3">
+                                            <i class="bi bi-truck text-danger fs-5 me-2"></i>
+                                            <strong>NH-53 / Amravati Bypass (4 Km)</strong>
+                                            <br><small class="text-muted">Quick logistics & supplier access.</small>
+                                        </li>
+                                        <li class="mb-3">
+                                            <i class="bi bi-train-front text-danger fs-5 me-2"></i>
+                                            <strong>Amravati Railway Station (3 Km)</strong>
+                                            <br><small class="text-muted">Convenient for commuters & visitors.</small>
+                                        </li>
+                                        <li class="mb-3">
+                                            <i class="bi bi-bus-front-fill text-danger fs-5 me-2"></i>
+                                            <strong>Central Bus Stand (2.5 Km)</strong>
+                                            <br><small class="text-muted">Steady daily passenger traffic.</small>
+                                        </li>
+                                        <li class="mb-3">
+                                            <i class="bi bi-hospital text-danger fs-5 me-2"></i>
+                                            <strong>PDMMC Hospital (2 Km)</strong>
+                                            <br><small class="text-muted">Demand for healthcare & retail nearby.</small>
+                                        </li>
+                                        <li class="mb-3">
+                                            <i class="bi bi-mortarboard-fill text-danger fs-5 me-2"></i>
+                                            <strong>Panchwati Chowk (1.5 Km)</strong>
+                                            <br><small class="text-muted">Education hub with colleges & coaching centers.</small>
+                                        </li>
+                                        <li class="mb-3">
+                                            <i class="bi bi-airplane-fill text-danger fs-5 me-2"></i>
+                                            <strong>Amravati Airport (18 Km)</strong>
+                                            <br><small class="text-muted">Adds value for corporate offices & professionals.</small>
+                                        </li>
+                                    </ul>
+                                </div>
+
+
+
+                                <!-- Right Column: Map + Narration -->
+                                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="250">
+                                    <div class="shadow-sm rounded-4 overflow-hidden">
+                                        <iframe id="mapFrame"
+                                                src="https://www.google.com/maps?q=&layer=c&cbll=20.9508847,77.762317&cbp=11,60.94,,0,-4.24&output=svembed"
+                                                width="100%"
+                                                height="350"
+                                                style="border:0;"
+                                                allowfullscreen=""
+                                                loading="lazy">
+                                        </iframe>
+                                    </div>
+                                    <p class="mt-3 text-muted">
+                                        <strong>Solaris Cube</strong> is surrounded by transport hubs, hospitals, residential zones,
+                                        and Amravati’s largest student cluster — giving your business
+                                        <em>constant visibility, unmatched connectivity, and guaranteed customer footfall</em>.
+                                    </p>
+                                    <a href="https://www.google.com/maps/%40?api=1&map_action=pano&viewpoint=20.9508847,77.762317&heading=60.94&pitch=-4.24&fov=80"
+                                       target="_blank" rel="noopener" id="btnStreet"
+                                       class="btn btn-outline-dark btn-sm rounded-pill mt-2">
+                                        View in Google Street View
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Extra styling -->
+                    <style>
+                        .divider {
+                            width: 80px;
+                            height: 3px;
+                            background: #e52e71;
+                            border-radius: 2px;
+                        }
+                    </style>
+
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio section">
+
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+            <h2>Gallery</h2>
+            <p>CHECK OUR Gallery</p>
+        </div><!-- End Section Title -->
+
+        <div class="container">
+
+            <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+
+
+
+                <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+
+                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+                        <div class="portfolio-content h-100">
+                            <img src="~/img/111.webp" class="img-fluid" loading="lazy" alt="" />
+                            <div class="portfolio-info">
+                                <a href="~/img/111.webp" data-gallery="portfolio-gallery-app" class="glightbox preview-link">@* <i class="bi bi-zoom-in"></i> *@</a>
+                                <a href="portfolio-details.html" title="Front Perspective View" class="details-link"></a>
+                            </div>
+                        </div>
+                    </div><!-- End Portfolio Item -->
+
+                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
+                        <div class="portfolio-content h-100">
+                            <img src="~/img/121.webp" class="img-fluid" alt="" loading="lazy" style="height:233px; width:420px;" />
+                            <div class="portfolio-info">
+                                <a href="~/img/121.webp" data-gallery="portfolio-gallery-product" class="glightbox preview-link">@* <i class="bi bi-zoom-in"> *@</i></a>
+                                <a href="portfolio-details.html" title=" Side Angle View" class="details-link"></a>
+                            </div>
+                        </div>
+                    </div><!-- End Portfolio Item -->
+
+                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
+                        <div class="portfolio-content h-100">
+                            <img src="~/img/131.webp" class="img-fluid" alt="" loading="lazy"  style="height:233px; width:420px;" />
+                            <div class="portfolio-info">
+                                <a href="~/img/131.webp" data-gallery="portfolio-gallery-branding" class="glightbox preview-link">@* <i class="bi bi-zoom-in"> *@</i></a>
+                                <a href="portfolio-details.html" title="Landscape View" class="details-link"></a>
+                            </div>
+                        </div>
+                    </div><!-- End Portfolio Item -->
+
+                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
+                        <div class="portfolio-content h-100">
+                            <img src="~/img/141.webp" class="img-fluid" alt="" loading="lazy" style="height:233px; width:420px;" />
+                            <div class="portfolio-info">
+                                <a href="~/img/141.webp" data-gallery="portfolio-gallery-book" class="glightbox preview-link">@* <i class="bi bi-zoom-in"></i> *@</a>
+                                <a href="portfolio-details.html" title="Main Elevation View" class="details-link"></a>
+                            </div>
+                        </div>
+                    </div><!-- End Portfolio Item -->
+
+                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+                        <div class="portfolio-content h-100">
+                            <img src="~/img/151.webp" class="img-fluid" alt="" loading="lazy" />
+                            <div class="portfolio-info">
+                                <a href="~/img/151.webp" data-gallery="portfolio-gallery-app" class="glightbox preview-link">@* <i class="bi bi-zoom-in"></i> *@</a>
+                                <a href="portfolio-details.html" title="Top View" class="details-link"></a>
+                            </div>
+                        </div>
+                    </div><!-- End Portfolio Item -->
+
+                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
+                        <div class="portfolio-content h-100">
+                            <img src="~/img/20-fotor-20250913017 (1).webp" class="img-fluid" alt="" loading="lazy" style="width:420px; height:233px; object-fit:cover;" />
+                            <div class="portfolio-info">
+                                <a href="~/img/20-fotor-20250913017 (1).webp" data-gallery="portfolio-gallery-product" class="glightbox preview-link">@* <i class="bi bi-zoom-in"></i> *@</a>
+                                <a href="portfolio-details.html" title="Night View" class="details-link"></a>
+                            </div>
+                        </div>
+                    </div><!-- End Portfolio Item -->
+
+                </div><!-- End Portfolio Container -->
+
+            </div>
+
+        </div>
+
+    </section><!-- /Portfolio Section -->
+    <!-- Team Section -->
+    <section id="team" class="team section bg-white">
+
+        <!-- Section Title -->
+        <div class="container section-title text-center" data-aos="fade-up">
+            <h2>FLOOR PLAN</h2>
+            <p>OUR FLOOR PLANS</p>
+            <span class="divider"></span>
+        </div>
+        <!-- End Section Title -->
+
+        <div class="container">
+            <div class="row gy-4 justify-content-center">
+
+                <!-- Team Member -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="team-card">
+                        <img src="~/img/f1.webp" alt="Walter White" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <h4>BASEMENT FLOOR PLAN</h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Team Member -->
+                <!-- Team Member -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="team-card">
+                        <img src="~/img/f2.webp" alt="Sarah Jhonson" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <h4>GROUND FLOOR PLAN</h4>
+                        </div>  
+                    </div>
+                </div>
+                <!-- End Team Member -->
+                <!-- Team Member -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f3.webp" alt="William Anderson" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>FIRST FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f4.webp" alt="William Anderson" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>SECOND FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f5.webp" alt="William Anderson" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>THIRD FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f6.webp" alt="William Anderson" cloading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>FOURTH FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f7.webp" alt="William Anderson" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>FIFTH FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f8.webp" alt="William Anderson" loading="lazy" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>SIIXTH FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <img src="~/img/f9.jpg" alt="William Anderson" class="img-fluid" />
+                        <div class="team-footer">
+                            <p>TERRACE FLOOR PLAN</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Team Member -->
+
+            </div>
+        </div>
+
+    </section>
+    <!-- /Team Section -->
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+            <h2>Contact</h2>
+            <p>SolarisCube</p>
+        </div><!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="row gy-4">
+                <div class="col-lg-6 ">
+                    <div class="row gy-4">
+
+                        <div class="col-lg-12">
+                            <div class="info-item" data-aos="fade-up" data-aos-delay="200">
+                                <!-- add inner padding so text doesn't hug the card edge -->
+                                <div class="row align-items-center g-3 g-md-4 w-100 p-3 p-md-4">
+
+                                    <!-- LEFT: icon centered, then heading + address -->
+                                    <div class="col-12 col-md-8">
+                                        <div class="d-flex flex-column align-items-center text-center px-2 px-md-4">
+                                            <!-- centered icon -->
+                                            <i class="bi bi-geo-alt display-5 text-danger mb-2"></i>
+
+                                            <h3 class="mb-2">Booking Address</h3>
+
+                                            <!-- a little start padding on md+ so it doesn't feel tight on the left -->
+                                            <p class="mb-0 ps-md-3">
+                                                4, Swapnashri Colony, Siddhivinayak Nagar, Ashiyad Square, Shegaon Road, Amravati
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- RIGHT: QR -->
+                                    <div class="col-12 col-md-4 text-center">
+                                        <img src="~/untitled design (3) (1).jpg"
+                                             alt="Scan QR to verify / enquire"
+                                             class="img-fluid"
+                                             style="max-width:100px; height:auto; object-fit:contain;" />
+                                        <div class="small text-muted mt-2">Scan to verify / enquire</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="col-md-6">
+                            <div class="info-item d-flex flex-column justify-content-center align-items-center" data-aos="fade-up" data-aos-delay="300">
+                                <i class="bi bi-telephone"></i>
+                                <h3>Call Us</h3>
+                                <p>+91 9091029102, +91 9370153221</p>
+                            </div>
+                        </div><!-- End Info Item -->
+
+                        <div class="col-md-6">
+                            <div class="info-item d-flex flex-column justify-content-center align-items-center" data-aos="fade-up" data-aos-delay="400">
+                                <i class="bi bi-envelope"></i>
+                                <h3>Email Us</h3>
+                                <p>Support@solariscube.in</p>
+                            </div>
+                        </div><!-- End Info Item -->
+
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <form id="contactForm" class="php-email-form" data-aos="fade-up" data-aos-delay="500">
+                        <div class="row gy-4">
+                            <div class="col-md-6">
+                                <input type="text" name="name" id="Name" class="form-control" placeholder="Your Name" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" name="email" id="Email" class="form-control" placeholder="Your Email" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="subject" id="Subject" class="form-control" placeholder="Subject" required />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="mobile" id="Mobile" class="form-control" placeholder="Mobile No" type="tel" maxlength="10" pattern="^(?!([0-9])\1{9})([6-9][0-9]{9})$" required />
+                            </div>
+
+                            <div class="col-md-12">
+                                <textarea name="message" id="Message" class="form-control" rows="4" placeholder="Message" required></textarea>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <button type="submit">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section><!-- /Contact Section -->
+    <div class="modal fade" id="floorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0">
+                <div class="modal-body p-0">
+                    <img id="floorModalImg"
+                         src=""
+                         alt=""
+                         class="img-fluid w-100 cursor-zoom-out"
+                         data-bs-dismiss="modal"
+                         role="button"
+                         tabindex="0"
+                         title="Click to close">
+
+                </div>
+                <div class="modal-footer">
+                    <h6 class="m-0" id="floorModalTitle"></h6>
+                    <button type="button" class="btn btn-dark ms-auto" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+
+<script>
+    $(function () {
+      const modalEl = document.getElementById('floorModal');
+      if (!modalEl) return;
+      const modal = new bootstrap.Modal(modalEl);
+
+      // Common reusable function
+      function openModal(src, title) {
+        $('#floorModalImg').attr('src', src);
+        $('#floorModalTitle').text(title || 'Image Preview');
+        modal.show();
+      }
+
+      // ===== 1️⃣ Floor Plan Section =====
+      $('#team .team-card img')
+        .css('cursor', 'zoom-in')
+        .attr({ tabindex: 0, role: 'button', title: 'Click to view floor plan' })
+        .on('click keydown', function (e) {
+          if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+          const src = this.getAttribute('src');
+          const title = $(this).closest('.team-card').find('.team-footer').text().trim();
+          openModal(src, title || 'Floor Plan');
+        });
+
+      // ===== 2️⃣ Portfolio / Gallery Section =====
+      $('.portfolio .portfolio-content')
+        .css('cursor', 'zoom-in')
+        .attr({ tabindex: 0, role: 'button', title: 'Click to view image' })
+        .on('click keydown', function (e) {
+          if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+          const img = $(this).find('img')[0];
+          if (!img) return;
+          const src = img.getAttribute('src');
+          const title =
+            img.getAttribute('alt')?.trim() ||
+            $(this).closest('.portfolio-item').find('.details-link').attr('title') ||
+            'Gallery Image';
+          openModal(src, title);
+        });
+
+      // Also trigger modal when clicking zoom icon
+      $('.portfolio .glightbox').on('click', function (e) {
+        e.preventDefault();
+        $(this).closest('.portfolio-content').trigger('click');
+      });
+
+      // ===== 3️⃣ Features / Amenities Section =====
+      $('#services .service-item img')
+        .css('cursor', 'zoom-in')
+        .attr({ tabindex: 0, role: 'button', title: 'Click to view feature image' })
+        .on('click keydown', function (e) {
+          if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+          const src = this.getAttribute('src');
+          const title = $(this).closest('.service-item').find('h3').text().trim();
+          openModal(src, title || 'Feature Image');
+        });
+    });
+</script>
+
+@* <script>
+    const btn = document.getElementById('btnStreet');
+    const frame = document.querySelector('#location iframe');
+    let isStreetView = true; // now default is Street View
+
+    btn?.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (!frame) return;
+
+      if (isStreetView) {
+        // switch to normal map
+        frame.src = "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3726.039694764713!2d77.76248799999999!3d20.950920999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjDCsDU3JzAzLjMiTiA3N8KwNDUnNDUuMCJF!5e0!3m2!1sen!2sin!4v1757764593387!5m2!1sen!2sin";
+        btn.textContent = "View in Google Street View";
+      } else {
+        // switch back to Street View
+        frame.src = "https://www.google.com/maps?q=&layer=c&cbll=20.9508847,77.762317&cbp=11,60.94,,0,-4.24&output=svembed";
+        btn.textContent = "View Default Map";
+      }
+      isStreetView = !isStreetView;
+    });
+</script> *@
+
+<script defer>
+    window.addEventListener("load", async () => {
+      // wait briefly to ensure iframe and button are in DOM
+      await new Promise(resolve => setTimeout(resolve, 800)); // 0.8s delay
+
+      const btn = document.getElementById("btnStreet");
+      const frame = document.querySelector("#location iframe");
+      if (!btn || !frame) return;
+
+      let isStreetView = true; // default view: Street View
+
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (!frame) return;
+
+        // tiny async pause to avoid blocking UI
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        if (isStreetView) {
+          // switch to normal map
+          frame.src = "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3726.039694764713!2d77.76248799999999!3d20.950920999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjDCsDU3JzAzLjMiTiA3N8KwNDUnNDUuMCJF!5e0!3m2!1sen!2sin!4v1757764593387!5m2!1sen!2sin";
+          btn.textContent = "View in Google Street View";
+        } else {
+          // switch back to Street View
+          frame.src = "https://www.google.com/maps?q=&layer=c&cbll=20.9508847,77.762317&cbp=11,60.94,,0,-4.24&output=svembed";
+          btn.textContent = "View Default Map";
+        }
+
+        isStreetView = !isStreetView;
+      });
+    });
+</script>
+
+
+
+
+<script>
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const data = {
+            Name: document.getElementById("Name").value,
+            Email: document.getElementById("Email").value,
+            Mobile: document.getElementById("Mobile").value,   // ✅ make sure ID matches your HTML
+            Subject: document.getElementById("Subject").value,
+            Message: document.getElementById("Message").value
+        };
+
+        fetch("/Home/SubmitContact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        .then(async response => {
+            let result = null;
+            try {
+                result = await response.json();
+            } catch (e) {
+                // response not JSON
+            }
+
+            if (response.ok && result?.success) {
+                     Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: "Your enquiry has been sent!",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+
+                document.getElementById("contactForm").reset();
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops!",
+                    text: result?.message || "Failed to send enquiry.",
+                    confirmButtonColor: "#d33"
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong. Please try again later.",
+                confirmButtonColor: "#d33"
+            });
+            console.error("Fetch error:", error);
+        });
+    });
+</script>
+
